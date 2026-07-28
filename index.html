@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Whiteboard</title>
+
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -123,6 +124,15 @@
     border-color: #333;
   }
 
+  /* If you replace the emoji with an <img>, this keeps it sized nicely.
+     e.g. <img src="marker-icon.png" class="tool-icon"> instead of the emoji text */
+  .tool-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
   #status {
     position: fixed;
     top: 12px;
@@ -170,13 +180,48 @@
 
   <div class="divider"></div>
 
+  <!--
+    TODO: Replace these emoji characters with <img> tags when you have
+    icon images ready, e.g.:
+    <button class="tool-btn active" id="markerBtn" title="Marker">
+      <img src="icons/marker.png" class="tool-icon" alt="Marker">
+    </button>
+    Keep the id, class, and title attributes the same so the JS below
+    still works without any changes.
+  -->
   <button class="tool-btn active" id="markerBtn" title="Marker">✏️</button>
   <button class="tool-btn" id="eraserBtn" title="Eraser">🧹</button>
   <button class="tool-btn" id="clearBtn" title="Clear all">🗑️</button>
 </div>
 
-<script>
-(function () {
+<!-- Firebase SDKs (loaded as ES modules straight from Google's CDN) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getFirestore, doc, setDoc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  // =====================================================================
+  // REPLACE WITH YOUR OWN FIREBASE CONFIG (see instructions comment at
+  // the top of this file for how to get these values).
+  // =====================================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyAU6fV8_YBbPJRn1Z05dC8f62YrDerCSfM",
+    authDomain: "whiteboard-903ab.firebaseapp.com",
+    projectId: "whiteboard-903ab",
+    storageBucket: "whiteboard-903ab.firebasestorage.app",
+    messagingSenderId: "1039300649038",
+    appId: "1:1039300649038:web:7c742afcfaa3b8836f631f",
+    measurementId: "G-FR2293LS3M"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // The whole board is stored as one document (one PNG snapshot).
+  // Simple and reliable for a casual shared whiteboard.
+  const boardRef = doc(db, "whiteboard", "shared-board");
+
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
   const statusEl = document.getElementById('status');
@@ -186,8 +231,7 @@
   let tool = 'marker'; // 'marker' | 'eraser'
   let drawing = false;
   let lastX = 0, lastY = 0;
-
-  const STORAGE_KEY = 'whiteboard-drawing';
+  let suppressNextRemoteRedraw = false; // avoid re-rendering our own save
   let saveTimeout = null;
 
   function setStatus(text, fade) {
@@ -237,7 +281,6 @@
     const pos = getPos(e);
     lastX = pos.x;
     lastY = pos.y;
-    // draw a dot for single clicks/taps
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, brushSize / 2, 0, Math.PI * 2);
     ctx.fillStyle = tool === 'eraser' ? '#ffffff' : color;
@@ -273,40 +316,52 @@
   async function saveDrawing() {
     try {
       const dataURL = canvas.toDataURL('image/png');
-      const result = await window.storage.set(STORAGE_KEY, dataURL, false);
-      if (result) {
-        setStatus('Saved', true);
-      } else {
-        setStatus('Save failed', true);
-      }
+      suppressNextRemoteRedraw = true;
+      await setDoc(boardRef, { image: dataURL, updatedAt: Date.now() });
+      setStatus('Saved', true);
     } catch (err) {
       console.error('Save error:', err);
-      setStatus('Save failed', true);
+      setStatus('Save failed — check Firebase config', true);
     }
   }
 
-  async function loadDrawing() {
-    try {
-      const result = await window.storage.get(STORAGE_KEY, false);
-      if (result && result.value) {
-        const img = new Image();
-        img.onload = () => {
-          const w = window.innerWidth;
-          const h = window.innerHeight;
-          ctx.drawImage(img, 0, 0, w, h);
-          setStatus('Loaded', true);
-        };
-        img.src = result.value;
-      } else {
+  // Real-time listener: redraws the board whenever ANYONE (including
+  // people on other devices) saves a new version.
+  function listenForUpdates() {
+    onSnapshot(boardRef, (snap) => {
+      if (!snap.exists()) {
         setStatus('Ready', true);
+        return;
       }
-    } catch (err) {
-      // key not found or other error - treat as blank board
-      setStatus('Ready', true);
-    }
+      // Don't redraw from the update we just triggered ourselves —
+      // avoids a flicker right after saving.
+      if (suppressNextRemoteRedraw) {
+        suppressNextRemoteRedraw = false;
+        return;
+      }
+      // Don't interrupt the person mid-stroke.
+      if (drawing) return;
+
+      const data = snap.data();
+      if (!data || !data.image) return;
+      const img = new Image();
+      img.onload = () => {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        setStatus('Updated', true);
+      };
+      img.src = data.image;
+    }, (err) => {
+      console.error('Sync error:', err);
+      setStatus('Sync failed — check Firebase config', true);
+    });
   }
 
-  // Pointer events (covers mouse + touch + pen uniformly where supported)
+  // Pointer events (mouse + touch)
   canvas.addEventListener('mousedown', startDraw);
   canvas.addEventListener('mousemove', draw);
   canvas.addEventListener('mouseup', endDraw);
@@ -366,7 +421,7 @@
   eraserBtn.addEventListener('click', () => { tool = 'eraser'; updateToolButtons(); });
 
   clearBtn.addEventListener('click', () => {
-    if (confirm('Clear the whole whiteboard? This cannot be undone.')) {
+    if (confirm('Clear the whole whiteboard for EVERYONE? This cannot be undone.')) {
       const w = window.innerWidth;
       const h = window.innerHeight;
       ctx.fillStyle = '#ffffff';
@@ -378,8 +433,7 @@
   // Init
   resizeCanvas();
   updateSizePreview();
-  loadDrawing();
-})();
+  listenForUpdates();
 </script>
 
 </body>
