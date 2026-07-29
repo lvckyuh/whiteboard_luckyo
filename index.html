@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Whiteboard</title>
-
+  
+<link rel="icon" type="image/x-icon" href="icon.jpeg">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -31,8 +32,7 @@
   <div class="divider"></div>
 
   <!--
-    TODO: Replace these emoji characters with <img> tags when you have
-    icon images ready, e.g.:
+    TODO: Replace emoji characters with <img> tags whenn images ready, e.g.:
     <button class="tool-btn active" id="markerBtn" title="Marker">
       <img src="icons/marker.png" class="tool-icon" alt="Marker">
     </button>
@@ -60,8 +60,7 @@
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
   // =====================================================================
-  // REPLACE WITH YOUR OWN FIREBASE CONFIG (see instructions comment at
-  // the top of this file for how to get these values).
+  // REPLACE WITH FIREBASE CONFIG (see instructions for me ltr
   // =====================================================================
   const firebaseConfig = {
     apiKey: "AIzaSyAU6fV8_YBbPJRn1Z05dC8f62YrDerCSfM",
@@ -94,10 +93,6 @@
   let saveTimeout = null;
 
   // ---- Undo / redo history ----
-  // We snapshot the canvas (as a dataURL) right before each stroke or
-  // clear begins. Undo pops the most recent snapshot and restores it
-  // (pushing the current state onto the redo stack); redo does the
-  // reverse. Capped so memory doesn't grow forever on a long session.
   const HISTORY_LIMIT = 50;
   let undoStack = [];
   let redoStack = [];
