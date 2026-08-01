@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>Whiteboard</title>
 
+<!-- Styles now live in their own file — see styles.css (must be in the
+     same folder as this HTML file when you upload to GitHub). -->
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,10 +21,11 @@
      board; don't rely on it for anything sensitive. -->
 <div id="passwordGate">
   <div id="passwordBox">
-    <h2>Private Whiteboard</h2>
+    <h2>Whiteboard</h2>
     <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
     <button id="passwordSubmit">Enter</button>
     <p id="passwordError">Incorrect password — try again.</p>
+    <div id="hintSticky">hint: 1234 lol</div>
   </div>
 </div>
 
@@ -93,18 +96,37 @@
 
   // =====================================================================
   // PASSWORD GATE (soft/casual protection — see note near the markup)
-  // TODO: change this to whatever password you want your friends to use.
+  // One shared password screen. Which password you type decides which
+  // board (and which set of saved drawings) you land on — they never
+  // mix. TODO: change these to whatever passwords you want to use.
   // =====================================================================
-  const BOARD_PASSWORD = "luckiscool";
+  const PRIVATE_PASSWORD = "luckiscool";
+  const PUBLIC_PASSWORD = "1234";
 
   const passwordGate = document.getElementById('passwordGate');
   const passwordInput = document.getElementById('passwordInput');
   const passwordSubmit = document.getElementById('passwordSubmit');
   const passwordError = document.getElementById('passwordError');
 
+  // Not set until a correct password picks which board to load.
+  let boardRef = null;
+
   function tryUnlock() {
-    if (passwordInput.value === BOARD_PASSWORD) {
+    const value = passwordInput.value;
+    let path = null;
+
+    if (value === PRIVATE_PASSWORD) {
+      path = 'whiteboard/shared-board';   // friends-only board
+      document.title = 'Whiteboard (Private)';
+    } else if (value === PUBLIC_PASSWORD) {
+      path = 'whiteboard/public-board';   // anyone-with-the-password board
+      document.title = 'Whiteboard (Public)';
+    }
+
+    if (path) {
+      boardRef = ref(db, path);
       passwordGate.style.display = 'none';
+      listenForUpdates();
     } else {
       passwordError.style.display = 'block';
       passwordInput.value = '';
@@ -116,10 +138,6 @@
     if (e.key === 'Enter') tryUnlock();
   });
   passwordInput.focus();
-
-  // The whole board is stored at one location (one PNG snapshot).
-  // Simple and reliable for a casual shared whiteboard.
-  const boardRef = ref(db, 'whiteboard/shared-board');
 
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
@@ -429,7 +447,6 @@
   resizeCanvas();
   updateSizePreview();
   updateUndoRedoButtons();
-  listenForUpdates();
 </script>
 
 </body>
