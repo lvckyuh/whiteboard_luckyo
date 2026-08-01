@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Whiteboard (Public)</title>
+<title>Whiteboard</title>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -19,7 +19,7 @@
      board; don't rely on it for anything sensitive. -->
 <div id="passwordGate">
   <div id="passwordBox">
-    <h2>Whiteboard</h2>
+    <h2>Private Whiteboard</h2>
     <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
     <button id="passwordSubmit">Enter</button>
     <p id="passwordError">Incorrect password — try again.</p>
@@ -73,6 +73,10 @@
     getDatabase, ref, set, onValue
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
+  // =====================================================================
+  // REPLACE WITH YOUR OWN FIREBASE CONFIG (see instructions comment at
+  // the top of this file for how to get these values).
+  // =====================================================================
   const firebaseConfig = {
     apiKey: "AIzaSyAU6fV8_YBbPJRn1Z05dC8f62YrDerCSfM",
     authDomain: "whiteboard-903ab.firebaseapp.com",
@@ -89,10 +93,9 @@
 
   // =====================================================================
   // PASSWORD GATE (soft/casual protection — see note near the markup)
-  // TODO: change this to whatever password you want to share publicly
-  // with "anyone" who should be able to draw here.
+  // TODO: change this to whatever password you want your friends to use.
   // =====================================================================
-  const BOARD_PASSWORD = "CHANGE_ME_PUBLIC";
+  const BOARD_PASSWORD = "luckiscool";
 
   const passwordGate = document.getElementById('passwordGate');
   const passwordInput = document.getElementById('passwordInput');
@@ -114,9 +117,9 @@
   });
   passwordInput.focus();
 
-  // Stored at a DIFFERENT path than the private board, so the two
-  // whiteboards never mix drawings.
-  const boardRef = ref(db, 'whiteboard/public-board');
+  // The whole board is stored at one location (one PNG snapshot).
+  // Simple and reliable for a casual shared whiteboard.
+  const boardRef = ref(db, 'whiteboard/shared-board');
 
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
