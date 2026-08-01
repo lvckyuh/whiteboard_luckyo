@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Whiteboard</title>
+<title>Whitebored</title>
 
 <!-- Styles now live in their own file — see styles.css (must be in the
      same folder as this HTML file when you upload to GitHub). -->
@@ -12,20 +12,17 @@
 
 <canvas id="canvas"></canvas>
 <div id="status">Loading…</div>
-<div id="cornerLabel">for Luck and Ygz</div>
+<div id="cornerLabel">:3</div>
 
 <!-- Password gate: covers everything until the correct password is entered.
-     NOTE: this is a soft/casual gate, not real security — the password
-     lives in this file's source code, so anyone who views page source
-     can find it. Fine for keeping casual visitors out of a friends'
-     board; don't rely on it for anything sensitive. -->
+     NOTE: this is a soft/casual gate, not real security so just because you hit inspect doesnt mean nuttin -->
 <div id="passwordGate">
   <div id="passwordBox">
     <h2>Whiteboard</h2>
     <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
     <button id="passwordSubmit">Enter</button>
     <p id="passwordError">Incorrect password — try again.</p>
-    <div id="hintSticky">hint: 1234 lol</div>
+    <div id="hintSticky">hint: 1234</div>
   </div>
 </div>
 
@@ -98,7 +95,7 @@
   // PASSWORD GATE (soft/casual protection — see note near the markup)
   // One shared password screen. Which password you type decides which
   // board (and which set of saved drawings) you land on — they never
-  // mix. TODO: change these to whatever passwords you want to use.
+  // mix. TODO: change these.
   // =====================================================================
   const PRIVATE_PASSWORD = "luckiscool";
   const PUBLIC_PASSWORD = "1234";
