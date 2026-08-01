@@ -4,6 +4,42 @@
 <meta charset="UTF-8">
 <title>Whiteboard (Public)</title>
 
+<!--
+  =====================================================================
+  SETUP INSTRUCTIONS (one-time, ~5 minutes)
+  =====================================================================
+  This whiteboard needs a free Firebase project to store drawings so
+  that EVERYONE who opens the page sees the same board (not just you).
+
+  1. Go to https://console.firebase.google.com and click "Add project".
+     Name it anything (e.g. "my-whiteboard"). You can skip Analytics.
+
+  2. Once created, click the "</>" (Web) icon to add a web app.
+     Give it a nickname, click "Register app". You'll be shown a
+     firebaseConfig object like the placeholder below — copy YOUR
+     values into the firebaseConfig object further down this file.
+
+  3. In the left sidebar, go to "Databases & Storage" -> "Realtime
+     Database" -> "Create database". Pick any region, then choose
+     "Start in test mode" (fine for a casual shared whiteboard;
+     anyone can read/write).
+
+  4. That's it. Replace the firebaseConfig placeholder below with your
+     real values, including databaseURL (shown at the top of the
+     Realtime Database "Data" tab, looks like
+     https://YOUR_PROJECT-default-rtdb.firebaseio.com). Commit to
+     GitHub, and reload the page. Every stroke is now saved and
+     synced to anyone else who has the page open (or opens it later).
+
+  NOTE: "test mode" security rules expire after 30 days and make the
+  database publicly writable. For a casual project that's usually
+  fine, but if you want it to keep working long-term / more securely,
+  look into Realtime Database security rules later.
+  =====================================================================
+-->
+
+<!-- Styles now live in their own file — see styles.css (must be in the
+     same folder as this HTML file when you upload to GitHub). -->
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -23,6 +59,7 @@
     <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
     <button id="passwordSubmit">Enter</button>
     <p id="passwordError">Incorrect password — try again.</p>
+    <div id="hintSticky">hint: 1234 lol</div>
   </div>
 </div>
 
@@ -73,6 +110,10 @@
     getDatabase, ref, set, onValue
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
+  // =====================================================================
+  // REPLACE WITH YOUR OWN FIREBASE CONFIG (see instructions comment at
+  // the top of this file for how to get these values).
+  // =====================================================================
   const firebaseConfig = {
     apiKey: "AIzaSyAU6fV8_YBbPJRn1Z05dC8f62YrDerCSfM",
     authDomain: "whiteboard-903ab.firebaseapp.com",
@@ -92,7 +133,7 @@
   // TODO: change this to whatever password you want to share publicly
   // with "anyone" who should be able to draw here.
   // =====================================================================
-  const BOARD_PASSWORD = "CHANGE_ME_PUBLIC";
+  const BOARD_PASSWORD = "1234";
 
   const passwordGate = document.getElementById('passwordGate');
   const passwordInput = document.getElementById('passwordInput');
