@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Whiteboard</title>
-  
-<link rel="icon" type="image/x-icon" href="icon.png">
+<title>Whiteboard (Public)</title>
+
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,13 +12,27 @@
 <div id="status">Loading…</div>
 <div id="cornerLabel">for Luck and Ygz</div>
 
+<!-- Password gate: covers everything until the correct password is entered.
+     NOTE: this is a soft/casual gate, not real security — the password
+     lives in this file's source code, so anyone who views page source
+     can find it. Fine for keeping casual visitors out of a friends'
+     board; don't rely on it for anything sensitive. -->
+<div id="passwordGate">
+  <div id="passwordBox">
+    <h2>Whiteboard</h2>
+    <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
+    <button id="passwordSubmit">Enter</button>
+    <p id="passwordError">Incorrect password — try again.</p>
+  </div>
+</div>
+
 <div id="toolbar">
   <div class="swatch-group" id="swatches">
     <button class="swatch active" data-color="#1a1a1a" style="background:#1a1a1a"></button>
-    <button class="swatch" data-color="#e03131" style="background:#E4002B"></button>
-    <button class="swatch" data-color="#2f9e44" style="background:#1cb981"></button>
-    <button class="swatch" data-color="#1971c2" style="background:#003087"></button>
-    <button class="swatch" data-color="#f08c00" style="background:#ff8da1"></button>
+    <button class="swatch" data-color="#E4002B" style="background:#E4002B"></button>
+    <button class="swatch" data-color="#1cb981" style="background:#1cb981"></button>
+    <button class="swatch" data-color="#003087" style="background:#003087"></button>
+    <button class="swatch" data-color="#ff8da1" style="background:#ff8da1"></button>
   </div>
 
   <input type="color" id="colorPicker" value="#1a1a1a" title="Custom color">
@@ -32,7 +45,8 @@
   <div class="divider"></div>
 
   <!--
-    TODO: Replace emoji characters with <img> tags whenn images ready, e.g.:
+    TODO: Replace these emoji characters with <img> tags when you have
+    icon images ready, e.g.:
     <button class="tool-btn active" id="markerBtn" title="Marker">
       <img src="icons/marker.png" class="tool-icon" alt="Marker">
     </button>
@@ -59,9 +73,6 @@
     getDatabase, ref, set, onValue
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
-  // =====================================================================
-  // REPLACE WITH FIREBASE CONFIG (see instructions for me ltr
-  // =====================================================================
   const firebaseConfig = {
     apiKey: "AIzaSyAU6fV8_YBbPJRn1Z05dC8f62YrDerCSfM",
     authDomain: "whiteboard-903ab.firebaseapp.com",
@@ -76,9 +87,36 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // The whole board is stored at one location (one PNG snapshot).
-  // Simple and reliable for a casual shared whiteboard.
-  const boardRef = ref(db, 'whiteboard/shared-board');
+  // =====================================================================
+  // PASSWORD GATE (soft/casual protection — see note near the markup)
+  // TODO: change this to whatever password you want to share publicly
+  // with "anyone" who should be able to draw here.
+  // =====================================================================
+  const BOARD_PASSWORD = "CHANGE_ME_PUBLIC";
+
+  const passwordGate = document.getElementById('passwordGate');
+  const passwordInput = document.getElementById('passwordInput');
+  const passwordSubmit = document.getElementById('passwordSubmit');
+  const passwordError = document.getElementById('passwordError');
+
+  function tryUnlock() {
+    if (passwordInput.value === BOARD_PASSWORD) {
+      passwordGate.style.display = 'none';
+    } else {
+      passwordError.style.display = 'block';
+      passwordInput.value = '';
+      passwordInput.focus();
+    }
+  }
+  passwordSubmit.addEventListener('click', tryUnlock);
+  passwordInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') tryUnlock();
+  });
+  passwordInput.focus();
+
+  // Stored at a DIFFERENT path than the private board, so the two
+  // whiteboards never mix drawings.
+  const boardRef = ref(db, 'whiteboard/public-board');
 
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
@@ -93,6 +131,10 @@
   let saveTimeout = null;
 
   // ---- Undo / redo history ----
+  // We snapshot the canvas (as a dataURL) right before each stroke or
+  // clear begins. Undo pops the most recent snapshot and restores it
+  // (pushing the current state onto the redo stack); redo does the
+  // reverse. Capped so memory doesn't grow forever on a long session.
   const HISTORY_LIMIT = 50;
   let undoStack = [];
   let redoStack = [];
