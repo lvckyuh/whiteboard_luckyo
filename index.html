@@ -2,23 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Whitebored</title>
+<title>Whiteboard</title>
 
+<link rel="icon" type="image/x-icon" href="icon.png">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <canvas id="canvas"></canvas>
 <div id="status">Loading…</div>
-<div id="cornerLabel">for Ygz</div>
-     
+<div id="cornerLabel">for Luck and Ygz</div>
+
 <div id="passwordGate">
   <div id="passwordBox">
-    <h2>Whitebored</h2>
+    <h2>Whiteboard</h2>
     <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
     <button id="passwordSubmit">Enter</button>
     <p id="passwordError">Incorrect password — try again.</p>
-    <div id="hintSticky">hint: 1234</div>
+    <div id="hintSticky">hint: 1234 lol</div>
   </div>
 </div>
 
@@ -40,29 +41,29 @@
 
   <div class="divider"></div>
 
-  <!--
-    TODO: Replace these emoji characters with <img> tags when you have
-    icon images ready, e.g.:
-    <button class="tool-btn active" id="markerBtn" title="Marker">
-      <img src="icons/marker.png" class="tool-icon" alt="Marker">
-    </button>
-    Keep the id, class, and title attributes the same so the JS below
-    still works without any changes.
-  -->
-  <button class="tool-btn active" id="markerBtn" title="Marker">✏️</button>
-  <button class="tool-btn" id="eraserBtn" title="Eraser">🧹</button>
+  <button class="tool-btn active" id="markerBtn" title="Marker">
+    <img src="icons/pencil.png" class="tool-icon" alt="Marker">
+  </button>
+  <button class="tool-btn" id="eraserBtn" title="Eraser">
+    <img src="icons/eraser.png" class="tool-icon" alt="Eraser">
+  </button>
 
   <div class="divider"></div>
 
-  <button class="tool-btn" id="undoBtn" title="Undo (Ctrl/Cmd+Z)" disabled>↶</button>
-  <button class="tool-btn" id="redoBtn" title="Redo (Ctrl/Cmd+Shift+Z)" disabled>↷</button>
+  <button class="tool-btn" id="undoBtn" title="Undo (Ctrl/Cmd+Z)" disabled>
+    <img src="icons/undo.png" class="tool-icon" alt="Undo">
+  </button>
+  <button class="tool-btn" id="redoBtn" title="Redo (Ctrl/Cmd+Shift+Z)" disabled>
+    <img src="icons/redo.png" class="tool-icon" alt="Redo">
+  </button>
 
   <div class="divider"></div>
 
-  <button class="tool-btn" id="clearBtn" title="Clear all">🗑️</button>
+  <button class="tool-btn" id="clearBtn" title="Clear all">
+    <img src="icons/trash.png" class="tool-icon" alt="Clear all">
+  </button>
 </div>
 
-<!-- Firebase SDKs (loaded as ES modules straight from Google's CDN) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import {
