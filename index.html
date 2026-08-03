@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Whitebored</title>
+<title>Whiteboard</title>
 
-<!-- Styles now live in their own file — see styles.css (must be in the
-     same folder as this HTML file when you upload to GitHub). -->
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <canvas id="canvas"></canvas>
 <div id="status">Loading…</div>
-<div id="cornerLabel">:3</div>
+<div id="cornerLabel">for Luck and Ygz</div>
 
-<!-- Password gate: covers everything until the correct password is entered.
-     NOTE: this is a soft/casual gate, not real security so just because you hit inspect doesnt mean nuttin -->
 <div id="passwordGate">
   <div id="passwordBox">
-    <h2>Whitebored</h2>
-    <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
-    <button id="passwordSubmit">Enter</button>
+    <h2>whitebored</h2>
+    <label id="passLabel" for="passwordInput">Password</label>
+    <div id="passRow">
+      <input type="password" id="passwordInput" autocomplete="off">
+      <button id="togglePassword" type="button" title="Show/hide password">👁</button>
+    </div>
+    <button id="passwordSubmit">↳ enter</button>
     <p id="passwordError">Incorrect password — try again.</p>
-    <div id="hintSticky">hint: 1234</div>
   </div>
+  <div id="hintSticky">hint: 1234</div>
 </div>
 
 <div id="toolbar">
@@ -73,10 +73,6 @@
     getDatabase, ref, set, onValue
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
-  // =====================================================================
-  // REPLACE WITH YOUR OWN FIREBASE CONFIG (see instructions comment at
-  // the top of this file for how to get these values).
-  // =====================================================================
   const firebaseConfig = {
     apiKey: "AIzaSyAU6fV8_YBbPJRn1Z05dC8f62YrDerCSfM",
     authDomain: "whiteboard-903ab.firebaseapp.com",
@@ -91,12 +87,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // =====================================================================
-  // PASSWORD GATE (soft/casual protection — see note near the markup)
-  // One shared password screen. Which password you type decides which
-  // board (and which set of saved drawings) you land on — they never
-  // mix. TODO: change these.
-  // =====================================================================
   const PRIVATE_PASSWORD = "luckiscool";
   const PUBLIC_PASSWORD = "1234";
 
@@ -104,6 +94,11 @@
   const passwordInput = document.getElementById('passwordInput');
   const passwordSubmit = document.getElementById('passwordSubmit');
   const passwordError = document.getElementById('passwordError');
+  const togglePassword = document.getElementById('togglePassword');
+
+  togglePassword.addEventListener('click', () => {
+    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+  });
 
   // Not set until a correct password picks which board to load.
   let boardRef = null;
