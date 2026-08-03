@@ -100,8 +100,8 @@ button.tool-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.1);
   background: #fff;
@@ -126,10 +126,35 @@ button.tool-btn:disabled:hover { background: #fff; }
 /* If you replace the emoji with an <img>, this keeps it sized nicely.
    e.g. <img src="marker-icon.png" class="tool-icon"> instead of the emoji text */
 .tool-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   pointer-events: none;
+  display: block;
+}
+
+/* The pencil and curved undo/redo arrows have more empty space around
+   their actual "ink" inside a square crop than the trash icon does, so
+   at the same box size they read as smaller. Bump those up so all five
+   icons look like the same visual size. */
+#markerBtn .tool-icon {
+  width: 28px;
+  height: 28px;
+}
+#undoBtn .tool-icon,
+#redoBtn .tool-icon {
+  width: 26px;
+  height: 26px;
+}
+#eraserBtn .tool-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Icons are black by default; invert to white when the button is
+   active/dark so they stay visible against the dark background. */
+button.tool-btn.active .tool-icon {
+  filter: invert(1);
 }
 
 #status {
@@ -214,6 +239,7 @@ button.tool-btn:disabled:hover { background: #fff; }
   margin-top: 10px;
 }
 
+/* Goofy "hint" sticky note under the password box */
 #hintSticky {
   margin: 18px auto 0 auto;
   width: 130px;
