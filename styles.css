@@ -189,29 +189,33 @@ button.tool-btn:disabled:hover { background: #fff; }
   font-family: "Comic Sans MS", "Marker Felt", cursive, sans-serif;
 }
 
+#passLabel {
+  display: block;
+  font-size: 13px;
+  color: #999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  margin-bottom: 10px;
+}
+
 #passRow {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
   border-bottom: 2px solid #1a1a1a;
-  padding-bottom: 8px;
-}
-
-#passRow label {
-  font-size: 16px;
-  color: #1a1a1a;
-  font-family: "Comic Sans MS", "Marker Felt", cursive, sans-serif;
-  white-space: nowrap;
+  padding-bottom: 10px;
 }
 
 #passwordInput {
   flex: 1;
   min-width: 0;
-  padding: 4px 2px;
-  font-size: 15px;
+  padding: 4px 0;
+  font-size: 26px;
+  letter-spacing: 4px;
   border: none;
   outline: none;
   background: transparent;
+  color: #1a1a1a;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -219,10 +223,11 @@ button.tool-btn:disabled:hover { background: #fff; }
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 22px;
   padding: 2px 4px;
   line-height: 1;
   opacity: 0.6;
+  flex-shrink: 0;
 }
 #togglePassword:hover { opacity: 1; }
 
